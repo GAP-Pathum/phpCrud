@@ -1,0 +1,223 @@
+### 💾 **SQL Statements and SQL Injection**
+
+SQL (Structured Query Language) is used to interact with databases. It allows you to perform various operations like retrieving, inserting, updating, and deleting data.
+
+---
+
+## 📝 **Common SQL Statements**
+
+### 🔍 **1. Data Querying (SELECT)**
+Retrieves data from a database table.
+
+**Syntax:**
+```sql
+SELECT column1, column2 FROM table_name WHERE condition;
+```
+
+**Example:**
+```sql
+SELECT name, age FROM users WHERE age > 18;
+```
+
+---
+
+### ✏️ **2. Data Insertion (INSERT)**
+Adds new records to a table.
+
+**Syntax:**
+```sql
+INSERT INTO table_name (column1, column2) VALUES ('value1', 'value2');
+```
+
+**Example:**
+```sql
+INSERT INTO users (name, age) VALUES ('Pasindu', 21);
+```
+
+---
+
+### 📝 **3. Data Updating (UPDATE)**
+Modifies existing records in a table.
+
+**Syntax:**
+```sql
+UPDATE table_name SET column1 = 'value1' WHERE condition;
+```
+
+**Example:**
+```sql
+UPDATE users SET age = 22 WHERE name = 'Pasindu';
+```
+
+---
+
+### 🗑️ **4. Data Deletion (DELETE)**
+Removes records from a table.
+
+**Syntax:**
+```sql
+DELETE FROM table_name WHERE condition;
+```
+
+**Example:**
+```sql
+DELETE FROM users WHERE age < 18;
+```
+
+---
+
+### 🗃️ **5. Creating a Table (CREATE)**
+Creates a new table in the database.
+
+**Syntax:**
+```sql
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50),
+    age INT
+);
+```
+
+---
+
+### 🛠️ **6. Dropping a Table (DROP)**
+Deletes a table from the database.
+
+**Syntax:**
+```sql
+DROP TABLE users;
+```
+
+---
+
+### 🚀 **7. Altering a Table (ALTER)**
+Modifies the structure of a table (e.g., adding or dropping columns).
+
+**Syntax:**
+```sql
+ALTER TABLE users ADD email VARCHAR(100);
+ALTER TABLE users DROP COLUMN age;
+```
+
+---
+
+### 📋 **8. Data Filtering with WHERE**
+Applies conditions to SQL queries.
+
+**Example:**
+```sql
+SELECT * FROM users WHERE age >= 18;
+```
+
+---
+
+### 🔀 **9. Sorting with ORDER BY**
+Sorts the results in ascending (`ASC`) or descending (`DESC`) order.
+
+**Example:**
+```sql
+SELECT * FROM users ORDER BY age DESC;
+```
+
+---
+
+### 🎯 **10. Grouping with GROUP BY**
+Groups rows that have the same values.
+
+**Example:**
+```sql
+SELECT age, COUNT(*) FROM users GROUP BY age;
+```
+
+---
+
+## 🚨 **SQL Injection**
+
+### ❗ **What is SQL Injection?**
+SQL Injection is a code injection technique where attackers insert malicious SQL code into a query. It can:
+1. Bypass authentication.
+2. Read or modify data.
+3. Execute administrative operations.
+4. Delete data.
+
+---
+
+### ⚠️ **Example of Vulnerable Code:**
+```php
+<?php
+$username = $_POST['username'];
+$password = $_POST['password'];
+
+$sql = "SELECT * FROM users WHERE username='$username' AND password='$password'";
+$result = $conn->query($sql);
+```
+
+#### 🧨 **How an Attacker Can Exploit:**
+If the attacker enters the following as the username:
+```
+' OR '1'='1
+```
+The query becomes:
+```sql
+SELECT * FROM users WHERE username='' OR '1'='1' AND password='';
+```
+This always evaluates to **true**, granting access.
+
+---
+
+## 🛡️ **How to Prevent SQL Injection**
+
+### ✅ **1. Use Prepared Statements (Recommended)**
+Prepared statements use placeholders to safely handle input.
+
+**Example (PHP with MySQLi):**
+```php
+<?php
+$username = $_POST['username'];
+$password = $_POST['password'];
+
+$stmt = $conn->prepare("SELECT * FROM users WHERE username = ? AND password = ?");
+$stmt->bind_param("ss", $username, $password);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+    echo "Login successful";
+} else {
+    echo "Invalid credentials";
+}
+?>
+```
+
+---
+
+### ✅ **2. Use Stored Procedures**
+Stored procedures are precompiled SQL statements that are executed on the database server.
+
+---
+
+### ✅ **3. Input Validation and Sanitization**
+Filter and escape user inputs to remove harmful characters.
+
+**Example:**
+```php
+$username = mysqli_real_escape_string($conn, $_POST['username']);
+```
+
+---
+
+### ✅ **4. Use ORM (Object Relational Mapping)**
+ORM libraries like **Eloquent** (Laravel) and **Doctrine** (PHP) abstract database queries and reduce SQL injection risks.
+
+---
+
+### ✅ **5. Least Privilege Principle**
+Grant the database user the minimum permissions required to perform their operations.
+
+---
+
+## 📝 **Key Takeaways**
+1. **SQL Injection is dangerous** because it can manipulate your database.
+2. **Always use prepared statements** to prevent SQL injection.
+3. **Input validation and sanitization** are crucial for secure applications.
+4. **Never directly insert user input** into SQL queries.
